@@ -46,47 +46,39 @@ app.post("/send-otp"  , (req , res)=> {
 
 //verify the otp 
 
-app.post("/verify-otp" , (req , res) => {
+app.post("/verify-otp", (req, res) => {
 
-	const {email , otp} = req.body ;
-	const record  = otpStore[email] ;
+    const { email, otp } = req.body;
+    const record = otpStore[email];
 
-	if(!record)
-	{
-	return res.status(400).json({
-	  message : "OTP NOT FOUND",
-	}) ;
+    if (!record) {
+        return res.status(400).json({
+            message: "OTP NOT FOUND",
+        });
+    }
 
-	if(Date.now() > expiresAt )
-	{
-		delete otpStore[email] ;
+    if (Date.now() > record.expiresAt) {
+        delete otpStore[email];
 
-		return res.status(403).json({
-			message : "OTP EXPIRED:(", 
-		}) ;
-	}
+        return res.status(403).json({
+            message: "OTP EXPIRED :(",
+        });
+    }
 
-	if(record.otp !== otp)
-	{
-		return res.status(403).json({
-			message : "THE PROVIDED OTP WAS NOT FOUND / MAYBE WRONG PLEASE CHECK IT" ,
-		});
-	}
+    if (record.otp !== otp) {
+        return res.status(403).json({
+            message: "THE PROVIDED OTP WAS NOT FOUND / MAYBE WRONG PLEASE CHECK IT",
+        });
+    }
 
-	delete otpStore[email] ;
+    delete otpStore[email];
 
+    res.json({
+        success: true,
+        message: "OTP VERIFIED SUCCESSFULLY",
+    });
 
-	res.json({
-
-		success : true ,
-		message : "OTP VERIFIED SUCCESSFULLY",
-
-
-	})
-
-}
-
-}) ;
+});
 
 
 app.listen(3000 , (req , res) => 
